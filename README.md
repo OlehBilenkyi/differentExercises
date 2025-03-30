@@ -6,6 +6,6 @@
 
 ## ⚙️ Технологии
 
-- HTML5, CSS3
+- HTML5, CSS3 
 - JavaScript (Fetch API, async/await)
 - REST API (OpenWeatherMap, JSONPlaceholder)
