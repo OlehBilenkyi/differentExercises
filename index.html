@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Text Manipulation</title>
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 100vh;
+        margin: 0;
+        background-color: #f4f4f4;
+      }
+
+      .container {
+        text-align: center;
+      }
+
+      #outputText {
+        margin-top: 20px;
+        padding: 10px;
+        border: 1px solid #ccc;
+        width: 50%;
+        min-height: 50px;
+        cursor: text;
+        user-select: none;
+      }
+
+      .highlight {
+        color: red;
+        cursor: pointer;
+        padding: 2px;
+      }
+
+      .highlight:active {
+        background-color: #ffcccb;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <input type="text" id="inputText" placeholder="Введите текст..." />
+      <button id="submitBtn">Отправить</button>
+      <div id="outputText" class="output-text"></div>
+    </div>
+
+    <script>
+      document
+        .getElementById("submitBtn")
+        .addEventListener("click", function () {
+          let inputText = document.getElementById("inputText").value;
+          let outputText = document.getElementById("outputText");
+          outputText.innerHTML = "";
+
+          // Разбиваем текст на отдельные буквы
+          for (let char of inputText) {
+            let span = document.createElement("span");
+            span.textContent = char;
+            span.classList.add("highlight");
+            outputText.appendChild(span);
+          }
+
+          enableDragAndDrop();
+        });
+
+      function enableDragAndDrop() {
+        const highlightElements = document.querySelectorAll(".highlight");
+        highlightElements.forEach((el) => {
+          el.addEventListener("mousedown", handleMouseDown);
+        });
+      }
+
+      let draggedElement = null;
+
+      function handleMouseDown(e) {
+        draggedElement = e.target;
+        draggedElement.style.position = "absolute";
+        draggedElement.style.zIndex = 1000;
+
+        document.body.appendChild(draggedElement);
+
+        moveAt(e);
+
+        function moveAt(e) {
+          draggedElement.style.left =
+            e.pageX - draggedElement.offsetWidth / 2 + "px";
+          draggedElement.style.top =
+            e.pageY - draggedElement.offsetHeight / 2 + "px";
+        }
+
+        function onMouseMove(e) {
+          moveAt(e);
+        }
+
+        document.addEventListener("mousemove", onMouseMove);
+
+        draggedElement.onmouseup = function () {
+          document.removeEventListener("mousemove", onMouseMove);
+          draggedElement.onmouseup = null;
+
+          // Возвращаем элемент в исходное положение
+          let elements = document.querySelectorAll(".highlight");
+          let closestElement = null;
+          let minDistance = Number.MAX_VALUE;
+          elements.forEach((el) => {
+            let rect = el.getBoundingClientRect();
+            let distance = Math.sqrt(
+              Math.pow(e.pageX - rect.left, 2) + Math.pow(e.pageY - rect.top, 2)
+            );
+            if (distance < minDistance && el !== draggedElement) {
+              closestElement = el;
+              minDistance = distance;
+            }
+          });
+
+          if (closestElement) {
+            // Меняем местами
+            let tempText = draggedElement.textContent;
+            draggedElement.textContent = closestElement.textContent;
+            closestElement.textContent = tempText;
+          }
+
+          draggedElement.style.position = "static";
+        };
+      }
+    </script>
+  </body>
+</html>
